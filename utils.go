@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/aerth/playwav"
 )
 
 func screenClear() {
@@ -22,7 +23,11 @@ func screenClear() {
 }
 
 func beep() {
-	c := exec.Command(`python -c 'from playsound import playsound; playsound("./assets/Ding.mp3")'`)
-	c.Stdout = os.Stdout
-	log.Println(c.Run())
+	_, err := playwav.FromFile("assets/bell.wav")
+	if err != nil {
+		panic(err)
+	}
+	// c := exec.Command(``)
+	// c.Stdout = os.Stdout
+	// log.Fatalln(c.Run())
 }

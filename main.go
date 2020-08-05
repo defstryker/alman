@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/defstryker/alman/dashboard"
+	"github.com/defstryker/alman/gmail"
+
 	"github.com/gen2brain/beeep"
 	. "github.com/logrusorgru/aurora"
 )
@@ -36,6 +38,7 @@ func main() {
 		// run auth to get and save headers
 		go servers[server.Name].Authenticate(&wgAuth)
 	}
+
 	wgAuth.Wait()
 
 	// waitgroup to gather the goroutines
@@ -50,6 +53,16 @@ func main() {
 		}
 
 		// gmail
+		gmail := gmail.Payload{
+			Wg:           &wg,
+			ClientID:     cfg.Gmail.ClientID,
+			ClientSecret: cfg.Gmail.ClientSecret,
+			RefreshToken: cfg.Gmail.RefreshToken,
+			User:         cfg.Gmail.ID,
+		}
+
+		wg.Add(1)
+		emails := gmail.GetUnread()
 
 		wg.Wait()
 
@@ -67,9 +80,9 @@ func main() {
 				stat += Magenta(fmt.Sprintf("[%s] :: %-20s: New Alert!!!\n", time.Now().Format(time.RFC1123), srv.Name)).String()
 
 				// beep here
-				// beep()
+				go beep()
 
-				err := beeep.Alert(srv.Name, "New Alerts on "+srv.Name, "assets/warning.png")
+				err := beeep.Notify(srv.Name, "New Alerts on "+srv.Name, "assets/warning.png")
 				if err != nil {
 					panic(err)
 				}
@@ -80,6 +93,11 @@ func main() {
 
 		// gmail
 		stat += Magenta("\n\nGMail\n=====\n").String()
+		if emails == 0 {
+			stat += "No unread emails"
+		} else {
+			stat += Cyan(fmt.Sprintf("%d unread emails...\n", emails)).String()
+		}
 
 		fmt.Print(stat)
 
