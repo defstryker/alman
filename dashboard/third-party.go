@@ -1,7 +1,9 @@
 package dashboard
 
 import (
+	"bufio"
 	"encoding/gob"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -19,6 +21,7 @@ const (
 	passwordURL   string = "/fapi/auth/v2/step/password"
 	challengeURL  string = "/fapi/auth/v2/step/challenge"
 	openIncidents string = "/fapi/incidents/search?count=500&open=true&state=0&state=1&open=true&state=2&"
+	endpoints     string = "/fapi/endpoints?sortBy=agentVersion:asc&count=500&"
 
 	None Status = iota
 	New
@@ -162,6 +165,57 @@ func (s *Server) GetAlerts(wg *sync.WaitGroup) {
 func isInEvents(id string, events *[]string) bool {
 	for _, val := range *events {
 		if val == id {
+			return true
+		}
+	}
+	return false
+}
+
+// GetOutdated clients
+func (s *Server) GetOutdated(wg *sync.WaitGroup) {
+	log.Println("Getting outdated from: ", s.Name)
+	defer wg.Done()
+	// open file
+	f, err := os.Create("./outputs/" + s.Name + ".txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	var ge GetEndpoints
+
+	resp, err := s.Session.Get(
+		s.URL+endpoints,
+		nil,
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = resp.JSON(&ge)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var outdated string = ""
+	for _, e := range ge.Data {
+		if isOutdated(e.AgentVersion) {
+			outdated += fmt.Sprintf("%s, %s\n", e.Name, e.AgentVersion)
+		}
+	}
+
+	w := bufio.NewWriter(f)
+	_, err = w.WriteString(outdated)
+	if err != nil {
+		panic(err)
+	}
+	w.Flush()
+}
+
+func isOutdated(ver string) bool {
+	outdated := []string{"0.50.0", "2.0.4", "2.0.5", "2.0.14"}
+	for _, out := range outdated {
+		if out == ver || ver == "" {
 			return true
 		}
 	}

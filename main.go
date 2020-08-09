@@ -2,20 +2,35 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/defstryker/alman/dashboard"
 	"github.com/defstryker/alman/gmail"
+	"github.com/spf13/cobra"
 
 	"github.com/gen2brain/beeep"
 	. "github.com/logrusorgru/aurora"
 )
 
+var rootCmd = &cobra.Command{
+	Use:   "alman",
+	Short: "Alert manager",
+	Long:  `Alman is an alert manager for a couple of dashboards and other services`,
+}
+
 func main() {
 	// Read config file
 	var cfg Config
 	cfg.Read()
+
+	// Setup cobra for getting outdated endpoints
+	rootCmd.PersistentFlags().BoolP("outdated", "o", false, "When set, generates the outdated endpoints list")
+
+	if cobraErr := rootCmd.Execute(); cobraErr != nil {
+		panic(cobraErr)
+	}
 
 	// goroutines for auth
 	var wgAuth sync.WaitGroup
@@ -37,9 +52,27 @@ func main() {
 		wgAuth.Add(1)
 		// run auth to get and save headers
 		go servers[server.Name].Authenticate(&wgAuth)
+		// get outdated clients
+		// wgAuth.Add(1)
+		// go servers[server.Name].GetOutdated(&wgAuth)
 	}
 
 	wgAuth.Wait()
+
+	// get outdated list
+	outdated, oe := rootCmd.Flags().GetBool("outdated")
+	if oe != nil {
+		panic(oe)
+	}
+	if outdated {
+		var w sync.WaitGroup
+		for _, s := range servers {
+			w.Add(1)
+			s.GetOutdated(&w)
+		}
+		w.Wait()
+		os.Exit(0)
+	}
 
 	// waitgroup to gather the goroutines
 	var wg sync.WaitGroup

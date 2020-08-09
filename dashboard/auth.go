@@ -201,3 +201,48 @@ type Alerts struct {
 		Title string `json:"title,omitempty"`
 	} `json:"data"`
 }
+
+// GetEndpoints from ReaQta
+type GetEndpoints struct {
+	Data []struct {
+		AgentVersion       string `json:"agentVersion"`
+		Arch               int64  `json:"arch"`
+		ComponentsVersions []struct {
+			Build   string `json:"build"`
+			Name    string `json:"name"`
+			Version string `json:"version"`
+		} `json:"componentsVersions"`
+		Connected           bool   `json:"connected"`
+		CPUDescr            string `json:"cpuDescr"`
+		CPUVendor           int64  `json:"cpuVendor"`
+		DisconnectionReason int64  `json:"disconnectionReason"`
+		Domain              string `json:"domain"`
+		EndpointID          string `json:"endpointId"`
+		Groups              []struct {
+			Description     string `json:"description"`
+			EndpointGroupID string `json:"endpointGroupId"`
+			Name            string `json:"name"`
+		} `json:"groups"`
+		HvStatus           int64         `json:"hvStatus"`
+		IsDomainController bool          `json:"isDomainController"`
+		IsServer           bool          `json:"isServer"`
+		IsVirtualMachine   bool          `json:"isVirtualMachine"`
+		Isolated           bool          `json:"isolated"`
+		Kernel             string        `json:"kernel"`
+		LastSeenAt         string        `json:"lastSeenAt"`
+		LocalAddr          string        `json:"localAddr"`
+		MachineID          string        `json:"machineId"`
+		Macs               []string      `json:"macs"`
+		Name               string        `json:"name"`
+		OpenIncidents      int64         `json:"openIncidents"`
+		Os                 string        `json:"os"`
+		OsType             int64         `json:"osType"`
+		RegistrationTime   string        `json:"registrationTime"`
+		SessionEnd         string        `json:"sessionEnd"`
+		SessionStart       string        `json:"sessionStart"`
+		State              int64         `json:"state"`
+		Tags               []interface{} `json:"tags"`
+	} `json:"data"`
+	NextPage       string `json:"nextPage"`
+	RemainingItems int64  `json:"remainingItems"`
+}
