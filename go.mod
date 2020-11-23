@@ -3,6 +3,7 @@ module github.com/defstryker/alman
 go 1.14
 
 require (
+	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/aerth/playwav v0.0.0-20170324024803-17dfe21a406f
 	github.com/cocoonlife/goalsa v0.0.0-20160812085113-b711ae6f3eff // indirect
