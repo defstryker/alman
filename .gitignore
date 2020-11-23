@@ -1,3 +1,4 @@
 .creds/
 alman
 outputs/
+*.xlsx
