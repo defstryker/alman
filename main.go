@@ -34,7 +34,7 @@ func main() {
 	var cfg Config
 	cfg.Read()
 
-	rootCmd.AddCommand(report)
+	// rootCmd.AddCommand(report)
 
 	// Setup cobra for getting outdated endpoints
 	rootCmd.PersistentFlags().BoolP("outdated", "o", false, "When set, generates the outdated endpoints list")
@@ -75,6 +75,10 @@ func main() {
 
 	wgAuth.Wait()
 
+	// endpoint summary
+	// https://s1.managedpdr.csintelligence.asia/fapi/profiling/groups/list
+	//
+
 	// report stuff here
 	// Solas: 527345349870747655
 	// MM : 547758193237819399
@@ -93,16 +97,10 @@ func main() {
 
 	os.Exit(1)
 
-	// servers["S1"].GenReport(10, "547758193237819399")
-	// fmt.Println(Magenta("Total: ").String(), totalIncCount)
-	// benignCount := servers["S1"].GetBenignCount(10, "547758193237819399")
-	// fmt.Println(Magenta("Benign: ").String(), benignCount)
-	// maliciousCount := servers["S1"].GetMalCount(10, "547758193237819399")
-	// fmt.Println(Magenta("Malicious: ").String(), maliciousCount)
-
-	os.Exit(0)
-
 	// report ends here...
+
+	// servers["S1"].GetGroups()
+	// os.Exit(0)
 
 	// get outdated list
 	outdated, oe := rootCmd.Flags().GetBool("outdated")
